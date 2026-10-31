@@ -1,0 +1,6 @@
+# host c301-003.ls6.tacc.utexas.edu
+# device NVIDIA A100-PCIE-40GB  CC 8.0  108 SMs  1410 MHz  39 GiB
+# FP32 peak 19492 GFLOP/s (SMs x lanes x 2 x max clock)
+# N=4096  alpha=1.25 beta=-0.75  1.37e+11 flop per call  median of timed launches
+rung               ms    GFLOP/s   %peak  %cuBLAS    max_err
+cublas         13.278    10350.7   53.1%   100.0%          -  reference

@@ -1,0 +1,12 @@
+==PROF== Connected to process 1677633 (/home1/11798/drippyemogirl/multi_lab2/starter_files/sgemm)
+==PROF== Profiling "ampere_sgemm_128x64_nn" - 0: 0%....50%....100% - 1 pass
+==PROF== Disconnected from process 1677633
+[1677633] sgemm@127.0.0.1
+  ampere_sgemm_128x64_nn (8, 16, 5)x(128, 1, 1), Context 1, Stream 7, Device 0, CC 8.0
+    Section: Command line profiler metrics
+    ---------------------- ----------- ------------
+    Metric Name            Metric Unit Metric Value
+    ---------------------- ----------- ------------
+    sm__cycles_elapsed.avg       cycle   178,961.54
+    ---------------------- ----------- ------------
+
