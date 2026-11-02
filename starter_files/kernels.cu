@@ -119,14 +119,30 @@ void sgemm_coalesced(int N, float alpha, const float* A,
 // ---------------------------------------------------------------------
 
 template <int T>
-__global__ void sgemm_tiled_kernel([[maybe_unused]] int N,
-                                   [[maybe_unused]] float alpha,
-                                   [[maybe_unused]] const float* A,
-                                   [[maybe_unused]] const float* B,
-                                   [[maybe_unused]] float beta,
-                                   [[maybe_unused]] float* C)
+__global__ void sgemm_tiled_kernel(int N, float alpha, const float* A,
+                                   const float* B, float beta, float* C)
 {
     // TODO: __shared__ float As[T][T], Bs[T][T]; then the tile loop.
+    __shared__ float As[T][T], Bs[T][T];
+
+    const int tx = threadIdx.x;
+    const int ty = threadIdx.y;
+    const int row = blockIdx.y * T + ty;
+    const int col = blockIdx.x * T + tx;
+
+    float dot = 0.0f;
+    for (int tile = 0; tile < N; tile += T) {
+        As[ty][tx] = A[row * N + tile + tx];
+        Bs[ty][tx] = B[(tile + ty) * N + col];
+        __syncthreads();
+
+        for (int k = 0; k < T; ++k) {
+            dot += As[ty][k] * Bs[k][tx];
+        }
+        __syncthreads();
+    }
+
+    C[row * N + col] = alpha * dot + beta * C[row * N + col];
 }
 
 // PROVIDED: launch the kernel instantiated for one tile size.
