@@ -8,7 +8,7 @@
  *
  * Created:     TODO
  * EID:         cc75926
- * Author:      Joy Chen, Esther Liu
+ * Author:      Joy Chen
  * Provenance:  I certify that all code contained herein is mine
  *              alone except where otherwise noted.
  *
