@@ -77,12 +77,27 @@ void sgemm_naive(int N, float alpha, const float* A,
 // Nothing else changes.  (Part 4 generalizes this kernel; see below.)
 // ---------------------------------------------------------------------
 
-void sgemm_coalesced([[maybe_unused]] int N, [[maybe_unused]] float alpha,
-                     [[maybe_unused]] const float* A,
-                     [[maybe_unused]] const float* B,
-                     [[maybe_unused]] float beta, [[maybe_unused]] float* C)
+__global__ void sgemm_coalesced_kernel(int N, float alpha, const float* A,
+                                      const float* B, float beta, float* C)
+{
+    const int row = blockIdx.y * blockDim.y + threadIdx.y;
+    const int col = blockIdx.x * blockDim.x + threadIdx.x;
+
+    float dot = 0.0f;
+    for (int k = 0; k < N; ++k) {
+        dot += A[row * N + k] * B[k * N + col];
+    }
+
+    C[row * N + col] = alpha * dot + beta * C[row * N + col];
+}
+
+void sgemm_coalesced(int N, float alpha, const float* A,
+                     const float* B, float beta, float* C)
 {
     // TODO
+    const dim3 block(TILE, TILE);
+    const dim3 grid(N / TILE, N / TILE);
+    sgemm_coalesced_kernel<<<grid, block>>>(N, alpha, A, B, beta, C);
 }
 
 // ---------------------------------------------------------------------
