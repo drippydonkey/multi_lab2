@@ -7,8 +7,8 @@
  *              launcher per rung.
  *
  * Created:     TODO
- * EID:         TODO
- * Author:      TODO
+ * EID:         cc75926
+ * Author:      Joy Chen, Esther Liu
  * Provenance:  I certify that all code contained herein is mine
  *              alone except where otherwise noted.
  *
@@ -43,13 +43,27 @@
 // Each thread computes the dot product of row `row` of A with column
 // `col` of B, then writes alpha*dot + beta*C[row][col].
 // ---------------------------------------------------------------------
+__global__ void sgemm_naive_kernel(int N, float alpha, const float* A,
+                                  const float* B, float beta, float* C)
+{
+    const int row = blockIdx.x * TILE + threadIdx.x;
+    const int col = blockIdx.y * TILE + threadIdx.y;
 
-void sgemm_naive([[maybe_unused]] int N, [[maybe_unused]] float alpha,
-                 [[maybe_unused]] const float* A,
-                 [[maybe_unused]] const float* B,
-                 [[maybe_unused]] float beta, [[maybe_unused]] float* C)
+    float dot = 0.0f;
+    for (int k = 0; k < N; ++k) {
+        dot += A[row * N + k] * B[k * N + col];
+    }
+
+    C[row * N + col] = alpha * dot + beta * C[row * N + col];
+}
+
+void sgemm_naive(int N, float alpha, const float* A,
+                 const float* B, float beta, float* C)
 {
     // TODO
+    const dim3 block(TILE, TILE);
+    const dim3 grid(N / TILE, N / TILE);
+    sgemm_naive_kernel<<<grid, block>>>(N, alpha, A, B, beta, C);
 }
 
 // ---------------------------------------------------------------------
